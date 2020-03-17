@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["C",""],["I",""],["M",""]],"mod":[["C","Cacheability control, for data accesses."],["I","Instruction access Cacheability control, for accesses at EL0 and EL1:"],["M","MMU enable for EL1 and EL0 stage 1 address translation. Possible values of this bit are:"]],"struct":[["Register",""]]});

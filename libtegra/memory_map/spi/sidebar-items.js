@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["BASE","Base address of the SPI registers."],["SPI_1","Start address of the SPI 2B-1 register block."],["SPI_2","Start address of the SPI 2B-2 register block."],["SPI_3","Start address of the SPI 2B-3 register block."],["SPI_4","Start address of the SPI 2B-4 register block."]]});

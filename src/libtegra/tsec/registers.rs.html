@@ -1,0 +1,575 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/tsec/registers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>registers.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../libtegra/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Abstractions over the Tegra Security Co-Processor registers.</span>
+
+<span class="kw">use</span> <span class="ident">register</span>::<span class="ident">mmio</span>::<span class="ident">ReadWrite</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">memory_map</span>::<span class="ident">TSEC</span>;
+
+<span class="doccomment">/// A pointer to the TSEC register block that can be accessed by dereferencing it.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REGISTERS</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Registers</span> <span class="op">=</span> <span class="ident">TSEC</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Registers</span>;
+
+<span class="comment">// TODO: Bitfields.</span>
+
+<span class="comment">// TODO: Convert this struct to register_structs! format.</span>
+
+<span class="comment">// FIXME: Are really all of them ReadWrite?</span>
+
+<span class="doccomment">/// Representation of the TSEC registers.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Registers</span> {
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_INCR_SYNCPT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_INCR_SYNCPT_CTRL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_INCR_SYNCPT_ERR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_CTXSW_INCR_SYNCPT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved4</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x10</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_CTXSW</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_CTXSW_NEXT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_CONT_SYNCPT_EOF</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_CONT_SYNCPT_L1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_STREAMID0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_STREAMID1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_THI_SEC</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved11</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_METHOD0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_METHOD1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved13</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x18</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_CONTEXT_SWITCH</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved14</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x14</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_INT_STATUS</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_INT_MASK</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_CONFIG0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_DBG_MISC</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_SLCG_OVERRIDE_HIGH_A</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_SLCG_OVERRIDE_LOW_A</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved20</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0xD70</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_THI_CLK_OVERRIDE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved21</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x1FC</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQSSET</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQSCLR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQSTAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQMODE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQMSET</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQMCLR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQMASK</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQDEST</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_GPTMRINT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_GPTMRVAL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_GPTMRCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_PTIMER0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_PTIMER1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_WDTMRVAL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_WDTMRCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IRQDEST2</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_MAILBOX0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_MAILBOX1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_ITFEN</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IDLESTATE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_CURCTX</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_NXTCTX</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_CTXACK</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_FHSTATE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_PRIVSTATE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_MTHDDATA</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_MTHDID</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_MTHDWDAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_MTHDCOUNT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_MTHDPOP</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_MTHDRAMSZ</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SFTRESET</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_OS</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_RM</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SOFT_PM</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SOFT_MODE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DEBUG1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DEBUGINFO</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IBRKPT1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IBRKPT2</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_CGCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_ENGCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_PMM</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_ADDR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IBRKPT3</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IBRKPT4</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IBRKPT5</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved68</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x14</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_EXCI</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SVEC_SPR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_RSTAT0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_RSTAT3</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_UNK_E0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved73</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x1C</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_CPUCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_BOOTVEC</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_HWCFG</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMACTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMATRFBASE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMATRFMOFFS</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMATRFCMD</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMATRFFBOFFS</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAPOLL_FB</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAPOLL_CP</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DBG_STATE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_HWCFG1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_CPUCTL_ALIAS</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved86</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_STACKCFG</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved87</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_IMCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMSTAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_TRACEIDX</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_TRACEPC</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMFILLRNG0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMFILLRNG1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMFILLCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMCTL_DEBUG</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_CMEMBASE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMAPERT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_EXTERRADDR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_EXTERRSTAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved99</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0xC</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_CG2</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMC0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMD0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMT0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved103</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMC1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMD1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMT1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved106</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMC2</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMD2</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMT2</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved109</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMC3</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMD3</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_IMEMT3</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved112</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMC0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMD0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMC1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMD1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMC2</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMD2</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMC3</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMD3</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMC4</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMD4</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMC5</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMD5</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMC6</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMD6</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMC7</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMEMD7</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_ICD_CMD</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_ICD_ADDR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_ICD_WDATA</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_ICD_RDATA</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved132</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x30</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_SCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SSTAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_UNK_248</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_UNK_24C</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_UNK_250</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved137</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0xC</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_UNK_260</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved138</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x1C</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_SPROT_IMEM</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SPROT_DMEM</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SPROT_CPUCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SPROT_MISC</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SPROT_IRQ</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SPROT_MTHD</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SPROT_SCTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_SPROT_WDTMR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved146</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x20</span>],
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_FINISHED_FBRD_LOW</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_FINISHED_FBRD_HIGH</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_FINISHED_FBWR_LOW</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_FINISHED_FBWR_HIGH</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_CURRENT_FBRD_LOW</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_CURRENT_FBRD_HIGH</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_CURRENT_FBWR_LOW</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_CURRENT_FBWR_HIGH</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">FALCON_DMAINFO_CTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved155</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x11C</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_CTL0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_CTL1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_CTL_STAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_CTL_LOCK</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_UNK_10</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_UNK_14</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_CTL_PKEY</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_UNK_1C</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_SEQ_CTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_SEQ_VAL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_SEQ_STAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved166</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_INSN_STAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved167</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x1c</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_UNK_50</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_AUTH_STAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_AES_STAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved170</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x14</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_UNK_70</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved171</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0xC</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_IRQSTAT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_IRQMASK</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved173</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x8</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_ACL_ERR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_UNK_94</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_SCP_INSN_ERR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved176</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x64</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_CLK_LIMIT_LOW</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_CLK_LIMIT_HIGH</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_UNK_08</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_TEST_CTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_TEST_CFG0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_TEST_SEED0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_TEST_CFG1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_TEST_SEED1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_UNK_20</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_UNK_24</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_UNK_28</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TRNG_CTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved188</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0xD0</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_CTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_MCCIF_FIFOCTRL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_THROTTLE</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_STAT0</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_STAT1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_RDCOUNT_LO</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_RDCOUNT_HI</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_WRCOUNT_LO</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_WRCOUNT_HI</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_R32COUNT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_R64COUNT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_DBG_R128COUNT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_UNK_30</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_MCCIF_FIFOCTRL1</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_WRR_RDP</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved203</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_SPROT_EMEM</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_TRANSCFG</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_REGIONCFG</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_ACTMON_ACTIVE_MASK</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_ACTMON_ACTIVE_BORPS</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_ACTMON_ACTIVE_WEIGHT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved209</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x8</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_ACTMON_MCB_MASK</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_ACTMON_MCB_BORPS</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_ACTMON_MCB_WEIGHT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved212</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x4</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_TFBIF_THI_TRANSPROP</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved213</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x5C</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_CG</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved214</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0x2C</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_BAR0_CTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_BAR0_ADDR</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_BAR0_DATA</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_BAR0_TIMEOUT</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">_reserved218</span>: [<span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="number">0xF0</span>],
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_FALCON_IP_VER</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_04</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_08</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_0C</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_10</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_14</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_18</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_1C</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_20</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_24</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_28</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_2C</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_30</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_UNK_34</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">TSEC_TEGRA_CTL</span>: <span class="ident">ReadWrite</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libtegra";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

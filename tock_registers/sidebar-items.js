@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["register_bitfields","Define register types and fields."],["register_bitmasks","Helper macro for defining register fields."],["register_fields",""],["register_structs",""],["test_fields",""]],"mod":[["macros","Macros for cleanly defining peripheral registers."],["registers","Implementation of registers and bitfields."]]});

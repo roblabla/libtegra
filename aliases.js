@@ -1,0 +1,15 @@
+var ALIASES = {};
+ALIASES["cortex_a"] = {};
+ALIASES["enum_primitive"] = {};
+ALIASES["libtegra"] = {};
+ALIASES["num_traits"] = {};
+ALIASES["paste"] = {};
+ALIASES["paste_impl"] = {};
+ALIASES["proc_macro2"] = {};
+ALIASES["proc_macro_hack"] = {};
+ALIASES["quote"] = {};
+ALIASES["register"] = {};
+ALIASES["static_assertions"] = {};
+ALIASES["syn"] = {};
+ALIASES["tock_registers"] = {};
+ALIASES["unicode_xid"] = {};

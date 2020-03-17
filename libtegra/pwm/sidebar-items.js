@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["REGISTERS","A pointer to the PWM register block that can be accessed by dereferencing it."]],"mod":[["PWM_CONTROLLER_PWM_CSR_0","Bitfields of the `PWM_CONTROLLER_PWM_CSR_<x>_0` register."]],"struct":[["Registers","Representation of the PWM Controller registers."]]});

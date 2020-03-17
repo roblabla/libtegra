@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Clock","Representation of a device clock."]]});
